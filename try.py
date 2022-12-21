@@ -1,4 +1,4 @@
-import datetime, logging, os, pprint, sys
+import datetime, json, logging, os, pprint, sys
 
 import whisper
 from config import settings
@@ -18,9 +18,15 @@ model = whisper.load_model( 'base' )
 audio_file_path = settings.AUDIO_FILE_PATH
 log.debug( f'audio_file_path, ``{audio_file_path}``' )
 result = model.transcribe( audio_file_path )
-transcription: str = result.get( 'text', '' )
 
 ## ouput transcription-text -----------------------------------------
+datestamp = datetime.datetime.now().isoformat().replace( ':', '-' ).replace( '.', '-' )
+jsn: str = json.dumps( result, indent=2 )
+jsn_path = f'{settings.TRANSCRIPTION_OUTPUT_DIR_PATH}/transcription_{str(datetime.datetime.now())}.json'
+log.debug( f'jsn_path, ``{jsn_path}``' )
+with open( jsn_path, 'w+' ) as f:
+    f.write( jsn )
+transcription: str = result.get( 'text', '' )  # type: ignore # type: ignore
 output_file_path = f'{settings.TRANSCRIPTION_OUTPUT_DIR_PATH}/transcription_{str(datetime.datetime.now())}.txt'
 log.debug( f'output_file_path, ``{output_file_path}``' )
 with open( output_file_path, 'w+' ) as f:
