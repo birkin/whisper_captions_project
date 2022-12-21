@@ -1,4 +1,7 @@
-import logging, os, pprint, sys
+import datetime, logging, os, pprint, sys
+
+import whisper
+from config import settings
 
 log = logging.getLogger(__name__)
 logging.basicConfig(
@@ -6,20 +9,19 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
+log.debug( 'logging ready' )
 
-log.debug( f'sys.path initially, ``{pprint.pformat(sys.path)}``' )
-
-PROJECT_CODE_DIR = os.environ['WHSPR__PROJECT_CODE_DIR_PATH']
-## add project-code parent dir to sys.path
-sys.path.append( os.path.dirname(PROJECT_CODE_DIR) )
-log.debug( f'sys.path now, ``{pprint.pformat(sys.path)}``' )
-
-import whisper
-from whisper_captions_project.config import settings
-
-model = whisper.load_model( "base" )
+## load model -------------------------------------------------------
+model = whisper.load_model( 'base' )
 
 ## transcribe quicktime .mov file -----------------------------------
-result = model.transcribe( settings.AUDIO_FILE_PATH, format='mov' )
+audio_file_path = settings.AUDIO_FILE_PATH
+log.debug( f'audio_file_path, ``{audio_file_path}``' )
+result = model.transcribe( audio_file_path )
+transcription: str = result.get( 'text', '' )
 
-print(result["text"])
+## ouput transcription-text -----------------------------------------
+output_file_path = f'{settings.TRANSCRIPTION_OUTPUT_DIR_PATH}/transcription_{str(datetime.datetime.now())}.txt'
+log.debug( f'output_file_path, ``{output_file_path}``' )
+with open( output_file_path, 'w+' ) as f:
+    f.write( transcription )
