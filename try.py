@@ -1,7 +1,9 @@
 import datetime, json, logging, os, pprint, sys
+from collections import OrderedDict
 
 import whisper
 from config import settings
+
 
 log = logging.getLogger(__name__)
 logging.basicConfig(
@@ -10,6 +12,7 @@ logging.basicConfig(
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
 log.debug( 'logging ready' )
+
 
 ## load model -------------------------------------------------------
 model = whisper.load_model( 'base' )
@@ -22,10 +25,11 @@ result = model.transcribe( audio_file_path )
 ## extract segment data ---------------------------------------------
 segments = []
 for segment in result.get( 'segments', [] ):
-    segments.append( {
-        'start': segment.get( 'start', '' ),
-        'end': segment.get( 'end', '' ),
-        'text': segment.get( 'text', '' ) } )
+    d = {}
+    d['start'] = segment.get( 'start', '' )    # type: ignore
+    d['end'] = segment.get( 'end', '' )        # type: ignore
+    d['text'] = segment.get( 'text', '' )      # type: ignore
+    segments.append( d )
 log.debug( f'segments, ``{pprint.pformat(segments)}``' )
 
 ## ouput data -------------------------------------------------------
