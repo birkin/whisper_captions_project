@@ -1,0 +1,2 @@
+-r requirements_base.txt
+pip-tools==6.12.1
