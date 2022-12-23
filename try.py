@@ -15,9 +15,9 @@ log.debug( 'logging ready' )
 
 
 ## load model -------------------------------------------------------
-# model = whisper.load_model( 'base' )  # averages about 2 minutes on this file
-model = whisper.load_model( 'medium' )  # averages about 14 minute on this file
-model = whisper.load_model( 'large-v2' )
+# model = whisper.load_model( 'base' )      # averages about 2 minutes on this file
+# model = whisper.load_model( 'medium' )    # averages about 14 minute on this file
+model = whisper.load_model( 'large' )
 
 ## transcribe quicktime .mov file -----------------------------------
 audio_file_path = settings.AUDIO_FILE_PATH
