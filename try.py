@@ -1,8 +1,10 @@
 import datetime, json, logging, os, pprint, sys
 from collections import OrderedDict
 
+import torch
 import whisper
 from config import settings
+# from tqdm import tqdm
 
 
 log = logging.getLogger(__name__)
@@ -14,10 +16,16 @@ log = logging.getLogger(__name__)
 log.debug( 'logging ready' )
 
 
+processing_device = torch.device( 'cuda' if torch.cuda.is_available() else 'cpu' )
+# processing_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+# processing_device = 'mps'
+log.debug( f'processing_device, ``{processing_device}``' )
+
 ## load model -------------------------------------------------------
 # model = whisper.load_model( 'base' )      # averages about 2 minutes on this file
 # model = whisper.load_model( 'medium' )    # averages about 14 minute on this file
-model = whisper.load_model( 'large' )
+# model = whisper.load_model( 'large' )
+model = whisper.load_model( 'large', device=processing_device )
 
 ## transcribe quicktime .mov file -----------------------------------
 audio_file_path = settings.AUDIO_FILE_PATH
@@ -26,6 +34,7 @@ result = model.transcribe( audio_file_path )
 
 ## extract segment data ---------------------------------------------
 segments = []
+# for segment in tqdm( result.get('segments', []) ):
 for segment in result.get( 'segments', [] ):
     d = OrderedDict()
     d['start'] = segment.get( 'start', '' )    # type: ignore
